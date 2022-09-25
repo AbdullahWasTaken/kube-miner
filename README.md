@@ -1,4 +1,4 @@
-[![CodeFactor](https://www.codefactor.io/repository/github/abdullahwastaken/kube-miner/badge)](https://www.codefactor.io/repository/github/abdullahwastaken/kube-miner)
-
 # kube-miner
-A complete package for mining graphs from a general purpose kubernetes cluster.
+
+Something on the lines of building a complete package for learning on inherent structures found in the microservices architecture.
+Functionally involving extarction of operational state of clusters running kubernetes, augmenting this using structural and accessibility patterns to gain insights over the general structure.
