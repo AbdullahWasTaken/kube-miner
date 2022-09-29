@@ -51,5 +51,4 @@ func RDF(st collector.ClusterState, path string) {
 		}
 		f.Sync()
 	}
-	fmt.Printf("\n%#v\n", uidMap)
 }
