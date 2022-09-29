@@ -6,6 +6,7 @@ import (
 
 	"github.com/AbdullahWasTaken/kube-miner/collector"
 	"github.com/AbdullahWasTaken/kube-miner/config"
+	"github.com/AbdullahWasTaken/kube-miner/utils"
 	"k8s.io/client-go/util/homedir"
 )
 
@@ -16,8 +17,9 @@ func main() {
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
-	outputPath := flag.String("out", "State", "relative path to where the collected data will be stored")
+	outputPath := flag.String("outputPath", "State", "relative path to where the collected data will be stored")
 	flag.Parse()
 	var c *config.Config = config.BuildConfig(kubeconfig, *outputPath)
-	collector.GetClusterState(c)
+	st := collector.GetState(c.DisClient, c.DynClient)
+	utils.RDF(st, c.OutputPath)
 }
