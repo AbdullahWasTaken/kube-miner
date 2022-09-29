@@ -13,7 +13,7 @@ type Config struct {
 	kubernetesConfig *rest.Config
 	DynClient        *dynamic.Interface
 	DisClient        *discovery.DiscoveryClient
-	Out              string
+	OutputPath       string
 }
 
 func BuildConfig(kubeconfig *string, outputPath string) *Config {
@@ -31,5 +31,5 @@ func BuildConfig(kubeconfig *string, outputPath string) *Config {
 	if err != nil {
 		log.Error(err)
 	}
-	return &Config{kubernetesConfig: config, DynClient: &dynamicClient, DisClient: typedClient.DiscoveryClient, Out: outputPath}
+	return &Config{kubernetesConfig: config, DynClient: &dynamicClient, DisClient: typedClient.DiscoveryClient, OutputPath: outputPath}
 }
