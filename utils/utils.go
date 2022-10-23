@@ -10,8 +10,8 @@ import (
 
 // Load all the resource states store in a json directory `jsonDir` and
 // returns a map containing json strings of loaded resource states.
-func LoadState(jsonDir string) map[string]interface{} {
-	cs := map[string]interface{}{}
+func LoadState(jsonDir string) map[string][]byte {
+	cs := map[string][]byte{}
 	files, err := os.ReadDir(jsonDir)
 	if err != nil {
 		log.Panic(err)
