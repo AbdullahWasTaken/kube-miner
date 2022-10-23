@@ -18,6 +18,9 @@ type triple struct {
 }
 
 func (r *triple) String() string {
+	if strings.HasPrefix(r.Object, "_:") {
+		return r.Subject + " <" + r.Predicate + "> " + r.Object + " .\n"
+	}
 	return r.Subject + " <" + r.Predicate + "> " + strconv.Quote(r.Object) + " .\n"
 }
 
