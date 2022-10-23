@@ -33,6 +33,20 @@ func (tpl *triples) String() string {
 	return sb.String()
 }
 
+func TargetRef(jsonStr []byte, rdfFilePath string) {
+	jqQuery := `select((.Object.kind | test("EndpointsList")) and (.items != null) and (.items[0] != null))
+				| [.items[] 
+					| .kind as $p1 
+					| (["_:", $p1,"-", .metadata.name]|add) as $s 
+					| .subsets[]? 
+					| .addresses[]? 
+					| select((.targetRef != null) and (.targetRef.kind != null) and (.targetRef.name != null)) 
+					| {"Subject": $s, "Predicate": ([$p1, "_", .targetRef.kind]|add) , "Object": (["_:", .targetRef.kind, "-", .targetRef.name]|add ) } ]`
+	if err := saveRdf(jqQuery, jsonStr, rdfFilePath); err != nil {
+		log.Error(err)
+	}
+}
+
 func NodeProp(jsonStr []byte, rdfFilePath string) {
 	jqQuery := `[.items[] 
 					| [paths(scalars) as $path 

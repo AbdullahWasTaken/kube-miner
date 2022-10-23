@@ -34,6 +34,7 @@ func main() {
 		for k, v := range cs {
 			transform.OwnRef(v, filepath.Join(rdfPath, k+"_ownRef"+".rdf"))
 			transform.NodeProp(v, filepath.Join(rdfPath, k+"_nodeProp"+".rdf"))
+			transform.TargetRef(v, filepath.Join(rdfPath, k+"_tarRef"+".rdf"))
 		}
 	} else {
 		log.Fatal("either kubeconfig or jsonPath must be set")
