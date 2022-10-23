@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
+	"os"
 	"path/filepath"
 
 	"github.com/AbdullahWasTaken/kube-miner/collector"
+	"github.com/AbdullahWasTaken/kube-miner/transform"
+	"github.com/AbdullahWasTaken/kube-miner/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,7 +25,16 @@ func main() {
 		// if everything was successfull, use the newly created json file in the next step
 		*jsonPath = filepath.Join(*outDir, "JSON")
 	} else if *jsonPath != "" {
+		cs := utils.LoadState(*jsonPath)
+		rdfPath := filepath.Join(*outDir, "RDF")
+		err := os.MkdirAll(rdfPath, os.ModePerm)
+		if err != nil {
+			log.Panic(err)
+		}
+		for k, v := range cs {
+			transform.OwnRef(v, filepath.Join(rdfPath, k+"_ownRef"+".rdf"))
 
+		}
 	} else {
 		log.Fatal("either kubeconfig or jsonPath must be set")
 	}
