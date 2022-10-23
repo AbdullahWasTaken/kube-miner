@@ -2,7 +2,6 @@ package transform
 
 import (
 	"encoding/json"
-	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -79,10 +78,12 @@ func saveRdf(jqQuery string, jsonStr []byte, rdfFilepath string) error {
 	if err != nil {
 		return err
 	}
-	// write RDF to file
-	err = os.WriteFile(rdfFilepath, []byte(rdf.String()), os.ModePerm)
-	if err != nil {
-		return err
+	if len(rdf) > 0 {
+		// write RDF to file
+		err = os.WriteFile(rdfFilepath, []byte(rdf.String()), os.ModePerm)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -90,20 +91,22 @@ func saveRdf(jqQuery string, jsonStr []byte, rdfFilepath string) error {
 func generateRDF(query *gojq.Query, input map[string]interface{}) (triples, error) {
 	iter := query.Run(input)
 	v, ok := iter.Next()
-	if !ok {
-		return nil, errors.New("iterator error")
+	rdf := triples{}
+	for ok {
+		if err, ok := v.(error); ok {
+			return nil, err
+		}
+		b, err := json.MarshalIndent(v, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		var ll triples
+		err = json.Unmarshal(b, &ll)
+		if err != nil {
+			return nil, err
+		}
+		rdf = append(rdf, ll...)
+		v, ok = iter.Next()
 	}
-	if err, ok := v.(error); ok {
-		return nil, err
-	}
-	b, err := json.MarshalIndent(v, "", "    ")
-	if err != nil {
-		return nil, err
-	}
-	var ll triples
-	err = json.Unmarshal(b, &ll)
-	if err != nil {
-		return nil, err
-	}
-	return ll, nil
+	return rdf, nil
 }
