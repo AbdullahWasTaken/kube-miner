@@ -1,44 +1,29 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"os"
 	"path/filepath"
 
 	"github.com/AbdullahWasTaken/kube-miner/collector"
-	"github.com/AbdullahWasTaken/kube-miner/config"
-	"github.com/AbdullahWasTaken/kube-miner/utils"
 	log "github.com/sirupsen/logrus"
-	"k8s.io/client-go/util/homedir"
 )
 
 func main() {
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	outputPath := flag.String("outputPath", "state", "relative path to where the collected data will be stored")
+	outDir := flag.String("out", "./out", "path to the output directory")
+	kubeconfig := flag.String("kubeconfig", "", "path to the kubeconfig file")
+	jsonPath := flag.String("json", "", "path to state JSON directory")
 	flag.Parse()
-	var c *config.Config = config.BuildConfig(kubeconfig, *outputPath)
-	st := collector.GetState(c.DisClient, c.DynClient)
-	b, err := json.MarshalIndent(st, "", "    ")
-	if err != nil {
-		log.Fatal(err)
+
+	// collect fresh state data from running kubernetes cluster
+	if *kubeconfig != "" {
+		c := collector.NewCollector(*kubeconfig)
+		c.Collect(*outDir)
+		log.Info("Kubernetes cluster state saved to ", *outDir)
+		// if everything was successfull, use the newly created json file in the next step
+		*jsonPath = filepath.Join(*outDir, "JSON")
+	} else if *jsonPath != "" {
+
+	} else {
+		log.Fatal("either kubeconfig or jsonPath must be set")
 	}
-	err = os.MkdirAll(c.OutputPath, os.ModePerm)
-	if err != nil {
-		log.Error(err)
-	}
-	f, err := os.Create(filepath.Join(c.OutputPath, "state.json"))
-	if err != nil {
-		log.Error(err)
-	}
-	_, err = f.Write(b)
-	if err != nil {
-		log.Error(err)
-	}
-	utils.RDF(st, c.OutputPath)
 }
